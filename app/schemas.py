@@ -1259,6 +1259,23 @@ class OnboardingEventListResponse(SchemaBase):
     limit: int = Field(ge=1, le=500)
     offset: int = Field(ge=0)
 
+# ---------------------------------------------------------------------------
+# Router compatibility aliases
+# ---------------------------------------------------------------------------
+
+OnboardingFlowResponse = OnboardingFlowRead
+OnboardingFlowVersionResponse = OnboardingFlowVersionRead
+OnboardingStepResponse = OnboardingStepRead
+OnboardingFieldResponse = OnboardingFieldRead
+OnboardingRequirementResponse = OnboardingRequirementRead
+OnboardingSessionResponse = OnboardingSessionRead
+OnboardingAnswerResponse = OnboardingAnswerRead
+OnboardingEventResponse = OnboardingEventRead
+SessionRequirementResponse = SessionRequirementRead
+
+OnboardingFlowVersionPublish = PublishFlowVersionRequest
+OnboardingFlowVersionRetire = RetireFlowVersionRequest
+
 
 # ---------------------------------------------------------------------------
 # General API response schemas

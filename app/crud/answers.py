@@ -89,6 +89,9 @@ def get_answer_by_field_key(
 def list_answers(
     db: Session,
     session_id: str,
+    *,
+    limit: int = 500,
+    offset: int = 0,
 ) -> Sequence[models.OnboardingAnswer]:
     """
     List all answers for a session in flow-definition order.
@@ -117,6 +120,8 @@ def list_answers(
             models.OnboardingField.position.asc(),
             models.OnboardingAnswer.id.asc(),
         )
+        .offset(offset)
+        .limit(limit)
     )
 
     return db.scalars(statement).all()

@@ -744,6 +744,7 @@ def mark_session_completed(
     onboarding_session.progress_percent = 100
     onboarding_session.completed_at = utc_now()
     onboarding_session.abandoned_at = None
+    onboarding_session.current_step_key = None
 
     db.flush()
 

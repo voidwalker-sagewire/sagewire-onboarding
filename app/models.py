@@ -946,7 +946,6 @@ class OnboardingSessionRequirement(Base):
         ),
         nullable=False,
         default=RequirementStatus.PENDING,
-        index=True,
     )
 
     external_reference: Mapped[str | None] = mapped_column(

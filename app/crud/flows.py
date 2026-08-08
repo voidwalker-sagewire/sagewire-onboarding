@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime, timezone
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
@@ -102,7 +102,6 @@ def resolve_flow(
 
     if flow is not None:
         return flow
-
     return get_flow_by_key(
         db,
         flow_reference,
@@ -111,10 +110,14 @@ def resolve_flow(
     )
 
 
+
+
 def list_flows(
     db: Session,
     *,
     status: models.FlowStatus | None = None,
+    subject_type: models.SubjectType | None = None,
+    search: str | None = None,
     limit: int = 100,
     offset: int = 0,
 ) -> Sequence[models.OnboardingFlow]:
@@ -127,6 +130,23 @@ def list_flows(
     if status is not None:
         statement = statement.where(
             models.OnboardingFlow.status == status
+        )
+
+    if subject_type is not None:
+        statement = statement.where(
+            models.OnboardingFlow.versions.any(
+                models.OnboardingFlowVersion.subject_type == subject_type
+            )
+        )
+
+    if search:
+        search_pattern = f"%{search.strip()}%"
+        statement = statement.where(
+            or_(
+                models.OnboardingFlow.flow_key.ilike(search_pattern),
+                models.OnboardingFlow.name.ilike(search_pattern),
+                models.OnboardingFlow.description.ilike(search_pattern),
+            )
         )
 
     statement = (
@@ -145,6 +165,8 @@ def count_flows(
     db: Session,
     *,
     status: models.FlowStatus | None = None,
+    subject_type: models.SubjectType | None = None,
+    search: str | None = None,
 ) -> int:
     """
     Count onboarding flows using the same filters as list_flows().
@@ -155,6 +177,23 @@ def count_flows(
     if status is not None:
         statement = statement.where(
             models.OnboardingFlow.status == status
+        )
+
+    if subject_type is not None:
+        statement = statement.where(
+            models.OnboardingFlow.versions.any(
+                models.OnboardingFlowVersion.subject_type == subject_type
+            )
+        )
+
+    if search:
+        search_pattern = f"%{search.strip()}%"
+        statement = statement.where(
+            or_(
+                models.OnboardingFlow.flow_key.ilike(search_pattern),
+                models.OnboardingFlow.name.ilike(search_pattern),
+                models.OnboardingFlow.description.ilike(search_pattern),
+            )
         )
 
     return int(db.scalar(statement) or 0)
@@ -1128,7 +1167,7 @@ def _build_step_record(
     )
 
     for field_in in step_in.fields:
-        field = _build_field_record(
+        _build_field_record(
             version=version,
             step=step,
             field_in=field_in,

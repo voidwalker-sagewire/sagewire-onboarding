@@ -316,6 +316,8 @@ def write_answers_bulk(
     db: Session,
     onboarding_session: models.OnboardingSession,
     bulk_in: schemas.OnboardingAnswerBulkWrite,
+    *,
+    commit: bool = True,
 ) -> list[models.OnboardingAnswer]:
     """
     Create or update multiple answers in one atomic transaction.
@@ -375,13 +377,17 @@ def write_answers_bulk(
             onboarding_session
         )
 
-        db.commit()
+        if commit:
+            db.commit()
 
-        for answer in saved_answers:
-            db.refresh(answer)
+            for answer in saved_answers:
+                db.refresh(answer)
+        else:
+            db.flush()
 
     except Exception:
-        db.rollback()
+        if commit:
+            db.rollback()
         raise
 
     return saved_answers

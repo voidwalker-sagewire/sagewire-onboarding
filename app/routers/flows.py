@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -590,6 +592,8 @@ def update_step(
 @router.delete(
     "/{flow_identifier}/versions/{version_identifier}/steps/{step_identifier}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
 )
 def delete_step(
     flow_identifier: str,
@@ -710,6 +714,8 @@ def update_field(
 @router.delete(
     "/{flow_identifier}/versions/{version_identifier}/fields/{field_identifier}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
 )
 def delete_field(
     flow_identifier: str,
@@ -822,6 +828,8 @@ def update_requirement(
 @router.delete(
     "/{flow_identifier}/versions/{version_identifier}/requirements/{requirement_identifier}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    response_model=None,
 )
 def delete_requirement(
     flow_identifier: str,
@@ -883,9 +891,17 @@ def get_flow_definition(
         include_definition=True,
     )
 
-    return flow_crud.build_flow_definition(
-        flow_version
-    )
+    return schemas.OnboardingFlowDefinitionResponse(
+    id=flow.id,
+    flow_key=flow.flow_key,
+    name=flow.name,
+    description=flow.description,
+    status=flow.status,
+    metadata_json=flow.metadata_json,
+    created_at=flow.created_at,
+    updated_at=flow.updated_at,
+    versions=[flow_version],
+)
 
 
 def _resolve_flow_or_404(

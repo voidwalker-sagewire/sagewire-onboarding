@@ -456,17 +456,6 @@ def write_answer(
         session_identifier,
     )
 
-    if (
-        answer_in.field_key is not None
-        and answer_in.field_key != field_key
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=(
-                "the route field key and request field key "
-                "do not match"
-            ),
-        )
 
     try:
         answer = answer_crud.write_answer(

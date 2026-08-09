@@ -251,6 +251,9 @@ def list_session_events(
     db: Session,
     session_id: str,
     *,
+    event_type: models.EventType | None = None,
+    actor_id: str | None = None,
+    correlation_id: str | None = None,
     limit: int = 100,
     offset: int = 0,
 ) -> Sequence[models.OnboardingEvent]:
@@ -261,6 +264,9 @@ def list_session_events(
     return list_events(
         db,
         session_id=session_id,
+        event_type=event_type,
+        actor_id=actor_id,
+        correlation_id=correlation_id,
         limit=limit,
         offset=offset,
     )
@@ -269,6 +275,10 @@ def list_session_events(
 def count_session_events(
     db: Session,
     session_id: str,
+    *,
+    event_type: models.EventType | None = None,
+    actor_id: str | None = None,
+    correlation_id: str | None = None,
 ) -> int:
     """
     Convenience wrapper for counting one session's events.
@@ -277,4 +287,7 @@ def count_session_events(
     return count_events(
         db,
         session_id=session_id,
+        event_type=event_type,
+        actor_id=actor_id,
+        correlation_id=correlation_id,
     )

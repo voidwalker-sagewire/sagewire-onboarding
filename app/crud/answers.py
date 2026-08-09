@@ -89,6 +89,9 @@ def get_answer_by_field_key(
 def list_answers(
     db: Session,
     session_id: str,
+    *,
+    limit: int = 500,
+    offset: int = 0,
 ) -> Sequence[models.OnboardingAnswer]:
     """
     List all answers for a session in flow-definition order.
@@ -117,6 +120,8 @@ def list_answers(
             models.OnboardingField.position.asc(),
             models.OnboardingAnswer.id.asc(),
         )
+        .offset(offset)
+        .limit(limit)
     )
 
     return db.scalars(statement).all()
@@ -316,6 +321,8 @@ def write_answers_bulk(
     db: Session,
     onboarding_session: models.OnboardingSession,
     bulk_in: schemas.OnboardingAnswerBulkWrite,
+    *,
+    commit: bool = True,
 ) -> list[models.OnboardingAnswer]:
     """
     Create or update multiple answers in one atomic transaction.
@@ -375,13 +382,17 @@ def write_answers_bulk(
             onboarding_session
         )
 
-        db.commit()
+        if commit:
+            db.commit()
 
-        for answer in saved_answers:
-            db.refresh(answer)
+            for answer in saved_answers:
+                db.refresh(answer)
+        else:
+            db.flush()
 
     except Exception:
-        db.rollback()
+        if commit:
+            db.rollback()
         raise
 
     return saved_answers

@@ -1263,6 +1263,270 @@ class OnboardingEventListResponse(SchemaBase):
 # Router compatibility aliases
 # ---------------------------------------------------------------------------
 
+class SessionActionRequest(SchemaBase):
+    actor_id: str | None = Field(
+        default=None,
+        max_length=200,
+    )
+
+    correlation_id: str | None = Field(
+        default=None,
+        max_length=120,
+    )
+
+    reason: str | None = Field(
+        default=None,
+        max_length=1000,
+    )
+
+class OnboardingSessionStateResponse(SchemaBase):
+    session: OnboardingSessionRead
+
+    answers: list[OnboardingAnswerRead] = Field(
+        default_factory=list,
+    )
+
+    requirements: list[SessionRequirementDetail] = Field(
+        default_factory=list,
+    )
+
+    visibility: dict[str, bool] = Field(
+        default_factory=dict,
+    )
+
+    completion: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+class OnboardingAnswerListResponse(SchemaBase):
+    items: list[OnboardingAnswerRead] = Field(
+        default_factory=list,
+    )
+
+    total: int = 0
+    limit: int = 500
+    offset: int = 0
+
+class OnboardingAnswerBulkResponse(SchemaBase):
+    items: list[OnboardingAnswerRead] = Field(
+        default_factory=list,
+    )
+
+    total: int = 0
+
+    validation: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+    completion: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+class ValidationIssueResponse(SchemaBase):
+    code: str
+    message: str
+
+    field_key: str | None = None
+    step_key: str | None = None
+
+    value: Any | None = None
+
+    details: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+
+class FieldValidationResponse(SchemaBase):
+    field_key: str
+    step_key: str | None
+
+    visible: bool
+    required: bool
+    valid: bool
+
+    normalized_value: Any | None = None
+
+    issues: list[ValidationIssueResponse] = Field(
+        default_factory=list,
+    )
+
+
+class StepValidationResponse(SchemaBase):
+    step_key: str
+    visible: bool
+    valid: bool
+
+    field_results: list[FieldValidationResponse] = Field(
+        default_factory=list,
+    )
+
+    issues: list[ValidationIssueResponse] = Field(
+        default_factory=list,
+    )
+
+class RequirementCompletionResponse(SchemaBase):
+    requirement_key: str
+    title: str | None = None
+
+    required: bool
+    visible: bool
+    status: str
+    satisfied: bool
+    blocking: bool
+
+    details: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+
+class StepCompletionResponse(SchemaBase):
+    step_key: str
+    title: str | None = None
+
+    visible: bool
+    completed: bool
+
+    completed_field_count: int
+    total_field_count: int
+
+    progress_percent: int = Field(
+        ge=0,
+        le=100,
+    )
+
+    blocking_field_keys: list[str] = Field(
+        default_factory=list,
+    )
+
+
+class SessionValidationDetailResponse(SchemaBase):
+    session_id: str
+    session_key: str
+    valid: bool
+    error_count: int
+
+    visible_step_keys: list[str] = Field(
+        default_factory=list,
+    )
+
+    visible_field_keys: list[str] = Field(
+        default_factory=list,
+    )
+
+    field_results: list[FieldValidationResponse] = Field(
+        default_factory=list,
+    )
+
+    issues: list[ValidationIssueResponse] = Field(
+        default_factory=list,
+    )
+
+
+class CompletionEvaluationResponse(SchemaBase):
+    session_id: str
+    session_key: str
+    session_status: str
+
+    can_complete: bool
+    fields_valid: bool
+    requirements_satisfied: bool
+
+    completed_field_count: int
+    total_field_count: int
+
+    satisfied_requirement_count: int
+    total_required_requirement_count: int
+
+    progress_percent: int = Field(
+        ge=0,
+        le=100,
+    )
+
+    current_step_key: str | None = None
+
+    blocking_field_keys: list[str] = Field(
+        default_factory=list,
+    )
+
+    blocking_requirement_keys: list[str] = Field(
+        default_factory=list,
+    )
+
+    visible_step_keys: list[str] = Field(
+        default_factory=list,
+    )
+
+    step_results: list[StepCompletionResponse] = Field(
+        default_factory=list,
+    )
+
+    requirement_results: list[RequirementCompletionResponse] = Field(
+        default_factory=list,
+    )
+
+    validation: SessionValidationDetailResponse | None = None
+
+class SessionRequirementSatisfy(SchemaBase):
+    satisfied_by: str = Field(
+        min_length=1,
+        max_length=200,
+    )
+
+    external_reference: str | None = Field(
+        default=None,
+        max_length=250,
+    )
+
+    details_json: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+    correlation_id: str | None = Field(
+        default=None,
+        max_length=120,
+    )
+
+class SessionRequirementReset(SchemaBase):
+    actor_id: str | None = Field(
+        default=None,
+        max_length=200,
+    )
+
+    details_json: dict[str, Any] = Field(
+        default_factory=dict,
+    )
+
+    correlation_id: str | None = Field(
+        default=None,
+        max_length=120,
+    )
+
+class SessionRequirementWaive(SchemaBase):
+    waived_by: str = Field(
+        min_length=1,
+        max_length=200,
+    )
+
+    reason: str = Field(
+        min_length=1,
+        max_length=1000,
+    )
+
+    correlation_id: str | None = Field(
+        default=None,
+        max_length=120,
+    )
+
+class SessionRequirementSyncResponse(SchemaBase):
+    created: list[SessionRequirementRead] = Field(
+        default_factory=list,
+    )
+
+    created_count: int = Field(
+        default=0,
+        ge=0,
+    )
+
 OnboardingFlowResponse = OnboardingFlowRead
 OnboardingFlowVersionResponse = OnboardingFlowVersionRead
 OnboardingStepResponse = OnboardingStepRead
@@ -1272,6 +1536,8 @@ OnboardingSessionResponse = OnboardingSessionRead
 OnboardingAnswerResponse = OnboardingAnswerRead
 OnboardingEventResponse = OnboardingEventRead
 SessionRequirementResponse = SessionRequirementRead
+
+OnboardingFlowDefinitionResponse = OnboardingFlowDetail
 
 OnboardingFlowVersionPublish = PublishFlowVersionRequest
 OnboardingFlowVersionRetire = RetireFlowVersionRequest

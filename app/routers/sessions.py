@@ -306,10 +306,18 @@ def get_session_definition(
             ),
         )
 
-    from app.crud import flows as flow_crud
+    flow = flow_version.flow
 
-    return flow_crud.build_flow_definition(
-        flow_version
+    return schemas.OnboardingFlowDefinitionResponse(
+        id=flow.id,
+        flow_key=flow.flow_key,
+        name=flow.name,
+        description=flow.description,
+        status=flow.status,
+        metadata_json=flow.metadata_json,
+        created_at=flow.created_at,
+        updated_at=flow.updated_at,
+        versions=[flow_version],
     )
 
 

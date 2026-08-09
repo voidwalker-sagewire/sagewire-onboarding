@@ -1172,7 +1172,6 @@ def _build_step_record(
             step=step,
             field_in=field_in,
         )
-        step.fields.append(field)
 
     return step
 

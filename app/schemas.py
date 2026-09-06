@@ -949,6 +949,8 @@ class SessionRequirementDetail(
 class SessionRequirementListResponse(SchemaBase):
     items: list[SessionRequirementDetail]
     total: int = Field(ge=0)
+    limit: int
+    offset: int
 
 
 # ---------------------------------------------------------------------------
